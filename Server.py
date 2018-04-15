@@ -15,12 +15,7 @@ class Server:
 
 	 def startGame():
 	 	#arbitrarily places players on board for now. we'll change this later
-	 	playersIn[0].x = 0
-	 	playersIn[0].y = 0
-	 	playersIn[0].z = 0
-	 	playersIn[1].x = 0
-	 	playersIn[1].y = 1
-	 	playersIn[1].z = 0
+
 
 	 def playGame():
 	 	if (not gameStarted):

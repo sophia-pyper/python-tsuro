@@ -14,9 +14,9 @@ class Board:
 						or ((i == 6 or i == 7) and (col == 0)) #left of spaces for first column
 						or ((i == 2 or i == 3) and (col == (cols-1)))): #right of spaces for last column
 						
-						space.append(["edge",1000]) #denotes walls/ticks
+						space.append([1,"X"]) #denotes walls/ticks
 					else:
-						space.append(["empty",1000])
+						space.append([0,"X"])
 				print space		
 				spaces.append(space)
 		self.spaces = spaces
@@ -25,17 +25,11 @@ class Board:
 		for path in tile.paths:
 			start = path[0]
 			end = path[1]
+			spaces[x][y][start][1] = end
+			spaces[x][y][end][1] = start
 
-			if (spaces[x][y][start][0] == "edge"):
-				spaces[x][y][end][0] = "X"
-			else if (spaces[x][y][end] == "X"):
-				spaces[x][y][start] = "X"
-			else:
-				spaces[x][y][end] = start
-				spaces[x][]
 
-	def checkAdjacentTick(row, col, tickNumber):
-		
+
 
 
 
