@@ -16,7 +16,6 @@ class sPlayer:
 	    5  4
 
 	"""
-	location = [0,0,0]
 
 	def __init__(self, color, age, locx, locy, locz):
 		#token color
