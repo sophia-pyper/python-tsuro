@@ -5,3 +5,5 @@ A player moving to a new tick will first check if the tick is an edge. If it is,
 During a given turn, the server will keep track of every tick each player visits. If two players visited the same tick within a turn, a collision has occurred and both are removed from the game. 
 
 The tick checks/collision checks will be run on every rotation of every tile of the player's hand before their turn. Any tile/rotation choice that results in the player's elimination will be added to a list on the server, and the server will not permit the player to select that move. If all moves result in edge or player collisions, the player can do whatever they want (ultimately maybe we can force them to make the move which doesn't suicide-murder another player).
+
+Possible future implementation: when running all of the tile rotation checks, store the outcomes of the turn (who dies, where the players end up) and just use that rather than resimulating the movement

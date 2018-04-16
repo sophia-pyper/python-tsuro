@@ -28,6 +28,10 @@ class Board:
 			spaces[x][y][start][1] = end
 			spaces[x][y][end][1] = start
 
+	def removeTile(x, y)
+		for i in range(8):
+			spaces[x][y][i][2] = "X"
+
 
 
 

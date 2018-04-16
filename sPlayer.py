@@ -27,6 +27,11 @@ class sPlayer:
 		self.age = age
 		#set player location on board, x and y representing which space and z representing which tick
 		self.location = [locx,locy,locz]
+		#list of tiles in hand. max three
+		self.hand = []
+		#flags player to be removed from game
+		self.dead = False
 
-	#list of tiles in player hand; max 3
-	hand = []
+	def updateLocation(x,y,z):
+		location = [x,y,z]
+
