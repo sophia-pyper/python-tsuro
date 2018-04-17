@@ -17,7 +17,7 @@ class sPlayer:
 
 	"""
 
-	def __init__(self, color, age, locx, locy, locz):
+	def __init__(self, color, age):
 		#token color
 		self.color = color
 		#easter egg
@@ -25,12 +25,18 @@ class sPlayer:
 			print("CONGRATULATIONS, YOU'RE THE OLDEST PERSON IN THE WORLD!")
 		self.age = age
 		#set player location on board, x and y representing which space and z representing which tick
-		self.location = [locx,locy,locz]
+		self.location = []
 		#list of tiles in hand. max three
 		self.hand = []
 		#flags player to be removed from game
 		self.dead = False
 
-	def updateLocation(x,y,z):
-		location = [x,y,z]
+	def updateLocation(self,x,y,z):
+		self.location = [x,y,z]
+
+	def kill(self,b):
+		self.dead = b
+
+	def addTileToHand(self,tile):
+		self.hand.append(tile)
 

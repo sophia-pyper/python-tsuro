@@ -1,8 +1,11 @@
+import copy
+
 class Board:
 	
 	def __init__(self, rows = 6, cols = 6):
 		self.rows = rows
 		self.cols = cols
+		self.players = []
 		spaces = []
 		#creates a matrix of empty spaces
 		for row in range(rows):
@@ -21,52 +24,56 @@ class Board:
 				spaces.append(space)
 		self.spaces = spaces
 
-	def addTileToBoard(tile, x, y)
+	#Puts the players on the board in the beginning of the game. Returns false if chosen starting spot is invalid
+	def placePlayer(self,player, x, y, z):
+		if (self.spaces[x][y][z] == 1): #and we will also have to check if another player is already there
+			player.updateLocation(x,y,z)
+			self.players.append(player)
+			return True
+		else:
+			return False
+
+	def removePlayer(self,player):
+		for i in range(len(players)):
+			if (players[i] == player):
+				del self.players[i]
+				return
+
+	#Adds tile to the board
+	def addTileToBoard(self,tile, x, y):
 		for path in tile.paths:
 			start = path[0]
 			end = path[1]
-			spaces[x][y][start][1] = end
-			spaces[x][y][end][1] = start
-
-	def removeTile(x, y)
-		for i in range(8):
-			spaces[x][y][i][2] = "X"
+			self.spaces[x][y][start][1] = end
+			self.spaces[x][y][end][1] = start
 
 	#Checks which moves would result in the death of the player. Returns list of these moves
-	 def findIllegalMoves(player, board):
+	 def findIllegalMoves(self, player):
 	 	
-	 	boardCopy = board
+	 	boardCopy = copy.deepcopy(self)
 	 	currRow = player.location[0]
 	 	currCol = player.location[1]
-	 	originalLocations = []
+	 	currTick = player.location[2]
 	 	illegalMoves = []
-	 	
-	 	#stores original locations of players
-	 	for p in playersIn:
-	 		originalLocations.append([p.location, p])
 	 	
 	 	#iterates through every rotation of every tile
 	 	for tile in player.hand:
 	 		for i in range(4):
 	 			tile.rotate()
 
-	 			#plays out a turn, moving players a checking for collisions
+	 			#plays out a turn, moving player and checking whether they die
 	 			boardCopy.addTileToBoard(tile, currRow, currCol)
-	 			for pl in playersIn:
-	 				movePlayer(pl)
-	 			collisionCheck()
+	 			
+	 			movePlayer(player)
 
 	 			#if at some point the player died, add the tile info to the illegal moves list
 	 			if (player.dead):
 	 				illegalMoves.append(tile.paths)
-
-	 			for pl in playersIn:
-	 				pl.dead = False
+	 				player.Kill(False)
 
 	 			#reverts board
-	 			board.removeTile(currRow, currCol)
-	 			for x in originalLocations
-	 				x[1].updateLocation(x[0][0], x[0][1],x[0][2])
+	 			boardCopy = copy.deepcopy(self)
+	 			player.updateLocation(currRow, currCol, currTick)
 
 	 	#If all moves are illegal, then none are			
 	 	if (len(illegalMoves) == (4* len(player.hand))):
@@ -76,14 +83,14 @@ class Board:
 
 
 	 #Returns true if edge, false if not
-	 def checkCurrTick(player):
-	 	if (board.spaces[player.location[0]][player.location[1]][player.location[2]] == 1):
+	 def checkCurrTick(self,player):
+	 	if (spaces[player.location[0]][player.location[1]][player.location[2]][0] == 1):
 	 		return True
 	 	else:
 	 		return False
 
 	 #Determines what tick/tile is adjacent to the current player position
-	 def checkAdjacentTick(player):
+	 def checkAdjacentTick(self,player):
 	 	newLoc = []
 	 	currRow = player.location[0]
 	 	currCol = player.location[1]
@@ -108,27 +115,24 @@ class Board:
 	 	return newLoc
 
 	#Moves the player character on the board
-	def movePlayer(player):
+	def movePlayer(self,player):
 	 	currRow = player.location[0]
 	 	currCol = player.location[1]
 	 	currTick = player.location[2]
 
-	 	#tracks the player's path this turn for collision detection
-	 	ticksVisited.append([player.location, player])
-
 	 	#looks at what tick the current path leads to
-	 	connector = board.spaces[currRow][currCol][currTick][1]
+	 	connector = spaces[currRow][currCol][currTick][1]
 	 	if (connector != "X"): #if a path exists
 	 		if (connector >= 0 and connector <= 7):
 	 			#Move player to tick at end of path
 	 			player.updateLocation(currRow, currCol, connector)
-	 			ticksVisited.append(player.location)
+
 	 		else:
 	 			print "Something went wrong - invalid path"
 
-		 	#check if player hit a wall
+		 	#check if player hit a wall. also checks for collisions inherently
 		 	if (checkCurrTick(player)):
-		 		player.dead = True
+		 		player.kill(True)
 		 		return
 
 		 	#otherwise, check tick of adjacent tile to see if path continues and keep moving if so
@@ -137,19 +141,6 @@ class Board:
 		 		player.updateLocation(newLocation[0], newLocation[1], newLocation[2])
 		 		movePlayer(player)
 
-	#Checks for collisions
-	def collisionCheck():
-		for i in range(len(ticksVisited)-1):
-			for j in range(i+1, len(ticksVisited)):
-				#checks whether a location has been visited twice
-				if (ticksVisited[i][0] == ticksVisited[j][0]):
-					#kills both players if so
-					if (ticksVisited[i][1].dead == False):
-						ticksVisited[i][1].dead == True
-					if (ticksVisited[j][1].dead == False):
-						ticksVisited[j][1].dead == True
-					break
-		ticksVisited = []
 
 
 
