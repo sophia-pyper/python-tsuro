@@ -25,8 +25,10 @@ class Server:
 	 	# 	return "Player ",playersIn[0]," has won!"
 	
 		while True: #while tile choice is invalid, keep getting different choice
- 			newTile = player.getTileChoice() #need to implement
+			player = playersIn[0]
+ 			newTile = player.getTileChoice() 
  			if (is_play_legal(newTile, player)):
+ 				player.removeTile(tile)
  				turn = play_a_turn(drawPile, playersIn, playersOut, gameBoard, newTile)
  				playersIn = turn[1]
  				if (turn[4]):

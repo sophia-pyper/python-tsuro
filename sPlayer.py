@@ -40,3 +40,12 @@ class sPlayer:
 	def addTileToHand(self,tile):
 		self.hand.append(tile)
 
+	def getTileChoice(self, tile):
+		return self.hand[0]
+
+	def removeTile(self, tile):
+		for t in range(len(hand)):
+			if (t == tile):
+				del self.hand[t]
+				return
+
