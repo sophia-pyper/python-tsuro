@@ -47,7 +47,7 @@ class Server:
 	 	badMovesList = board.findIllegalMoves(player)
 	 	if (tile.paths in badMovesList):
 	 		return False
-	 	else if (tile not in player.hand):
+	 	elif (tile not in player.hand):
 	 		return False
 	 	else:
 	 		return True
@@ -96,8 +96,6 @@ class Server:
 	 	return results
 
 
-newServ = Server()
+#newServ = Server()
 
-newServ.startGame()
-
-
+#newServ.startGame()

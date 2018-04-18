@@ -31,8 +31,8 @@ class sPlayer:
 		#flags player to be removed from game
 		self.dead = False
 
-	def updateLocation(self,x,y,z):
-		self.location = [x,y,z]
+	def updateLocation(self,r,c,t):
+		self.location = [r,c,t]
 
 	def kill(self,b):
 		self.dead = b
@@ -44,8 +44,7 @@ class sPlayer:
 		return self.hand[0]
 
 	def removeTile(self, tile):
-		for t in range(len(hand)):
-			if (t == tile):
+		for t in range(len(self.hand)):
+			if (self.hand[t] == tile):
 				del self.hand[t]
 				return
-
