@@ -5,7 +5,6 @@ class Board:
 	def __init__(self, rows = 6, cols = 6):
 		self.rows = rows
 		self.cols = cols
-		self.players = []
 		spaces = []
 		#creates a matrix of empty spaces
 		for row in range(rows):
@@ -31,17 +30,10 @@ class Board:
 		#if there is a 1, then that means edge (good), if there is a P, then that means already occupied
 		if (self.spaces[r][c][t][0] == 1 and self.spaces[r][c][t][1] != "P"):
 			player.updateLocation(r,c,t)
-			self.players.append(player)
 			self.spaces[r][c][t][1] = "P"
 			return True
 		else:
 			return False
-
-	def removePlayer(self,player):
-		for i in range(len(players)):
-			if (self.players[i] == player):
-				del self.players[i]
-				return
 
 	#Adds tile to the board
 	def addTileToBoard(self,tile, r, c):
@@ -52,12 +44,13 @@ class Board:
 			self.spaces[r][c][end][1] = start
 
 	#Checks which moves would result in the death of the player. Returns list of these moves
-	def findIllegalMoves(self, player):
+	def findLegalMoves(self, player):
 	 	
 	 	boardCopy = copy.deepcopy(self)
 	 	currRow = player.location[0]
 	 	currCol = player.location[1]
 	 	currTick = player.location[2]
+	 	legalMoves = []
 	 	illegalMoves = []
 	 	
 	 	#iterates through every rotation of every tile
@@ -70,20 +63,22 @@ class Board:
 	 			
 	 			boardCopy.movePlayer(player)
 
-	 			#if at some point the player died, add the tile info to the illegal moves list
+	 			#if at some point the player died, add move to illegal list
 	 			if (player.dead):
-	 				illegalMoves.append(tile.paths)
-	 				player.kill(False)
-
+	 				player.dead = False
+	 				illegalMoves.append()
+	 			#otherwise, move is legal and can be added to list
+	 			else:
+	 				legalMoves.append()
 	 			#reverts board
 	 			boardCopy = copy.deepcopy(self)
 	 			player.updateLocation(currRow, currCol, currTick)
 
-	 	#If all moves are illegal, then none are			
-	 	if (len(illegalMoves) == (4* len(player.hand))):
-	 		illegalMoves = []
+	 	#If no moves are legal, makes all the illegal moves legal			
+	 	if not legalMoves:
+	 		legalMoves = illegalMoves
 	 	
-	 	return illegalMoves
+	 	return legalMoves
 
 
 	#Returns true if edge, false if not
@@ -136,7 +131,7 @@ class Board:
 
 		 	#check if player hit a wall. also checks for collisions inherently
 		 	if (self.checkCurrTick(player)):
-		 		player.kill(True)
+		 		player.dead = True
 		 		return
 
 		 	#otherwise, check tick of adjacent tile to see if path continues and keep moving if so
@@ -144,3 +139,12 @@ class Board:
 		 		newLocation = self.checkAdjacentTick(player)
 		 		player.updateLocation(newLocation[0], newLocation[1], newLocation[2])
 		 		self.movePlayer(player)
+
+	#Moves all players and returns list of dead players
+	def moveAllPlayers(self, inList):
+		deadList = []
+		for p in inList:
+			self.movePlayer(p)
+			if (p.dead):
+				deadList.append(p)
+		return deadList

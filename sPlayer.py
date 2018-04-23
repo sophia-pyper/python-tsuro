@@ -34,9 +34,6 @@ class sPlayer:
 	def updateLocation(self,r,c,t):
 		self.location = [r,c,t]
 
-	def kill(self,b):
-		self.dead = b
-
 	def addTileToHand(self,tile):
 		self.hand.append(tile)
 
@@ -48,3 +45,4 @@ class sPlayer:
 			if (self.hand[t] == tile):
 				del self.hand[t]
 				return
+
