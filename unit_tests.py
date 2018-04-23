@@ -7,13 +7,13 @@ from Server import Server
 #game class instances to be used in testing below
 player1 = sPlayer("blue", 20)
 player2 = sPlayer("red", 30)
-testtile = Tile(0)  #paths list is [[0,1],[2,3],[4,5],[6,7]]
+testtile = Tile([[0,1],[2,3],[4,5],[6,7]])  
 testboard = Board()
 
 
-"""
-TILE TESTS
-"""
+
+#TILE TESTS
+
 #test that constructor works
 if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
 	print "Tile constructor test failed!"
@@ -34,9 +34,9 @@ if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
 	print "Tile multi-rotation test failed!"
 
 
-"""
-sPlayer TESTS
-"""
+
+#sPlayer TESTS
+
 #test for adding tile to hand
 player1.addTileToHand(testtile)
 if(len(player1.hand)==0):
@@ -47,17 +47,17 @@ player1.removeTile(testtile)
 if(len(player1.hand)!=0):
 	print "Remove tile from hand test failed!"
 
-""" WE KNOW THAT THIS WORKS
+#WE KNOW THAT THIS WORKS
 #test that killing player works
 player1.kill(True)
 if(not player1.dead):
 	print "Player kill test failed!"
-"""
 
 
-"""
-Board TESTS
-"""
+
+
+#Board TESTS
+
 #test for adding player1 to board
 t1 = testboard.placePlayer(player1,0,0,0) #place player1 on the upper left most tick
 if(not t1):
@@ -102,3 +102,63 @@ if(player2.location != [0,1,7]):
 	print "movePlayer on Player2 test failed!"
 if(not player1.dead):
 	print "movePlayer on Player1 test failed!"
+
+###MOVEMENT TESTS###
+
+#Tests whether player can successfully move from the edge
+def moveFromEdge():
+	player1 = sPlayer("blue", 20)
+	testBoard = Board()
+	tile = Tile([[0,2],[1,4],[3,7],[5,6]])
+	testBoard.placePlayer(player1, 0, 0, 0)
+	testBoard.addTileToBoard(tile,0,0)
+	testBoard.movePlayer(player1)
+	if (player1.location == [0,1,7]):
+		print "moveFromEdge passed"
+	else:
+		print "moveFromEdge failed with player location at ", player1.location, " rather than [0,1,7]."
+	return
+
+#Tests whether player successfully traverses multiple tiles
+def multiTileMove():
+	player1 = sPlayer("blue", 20)
+	testBoard = Board()
+	#player would move from 0 to 2
+	tile1 = Tile([[0,2],[1,7],[3,4],[5,6]])
+	#player would continue to 7 and move to 4
+	tile2 = Tile([[0,3],[1,6],[2,5],[4,7]])
+	#player would continue to 1 and move to 5
+	tile3 = Tile([[0,6],[1,5],[2,4],[3,7]])
+	#player would continue to 0 then stop
+
+	testBoard.placePlayer(player1, 0, 0, 0)
+	testBoard.addTileToBoard(tile1,0,0)
+	testBoard.addTileToBoard(tile2,0,1)
+	testBoard.addTileToBoard(tile3,1,1)
+	testBoard.movePlayer(player1)
+
+
+	if (player1.location == [2,1,0]):
+		print "multiTileMove passed"
+	else:
+		print "multiTileMove failed with player location at ", player1.location, " rather than [2,1,0]."
+
+def multiPlayerMove():
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	playerList = [player1, player2]
+
+	testBoard = Board()
+	tile = Tile([[0,4],[1,5],[2,6],[3,7]])
+
+	testBoard.placePlayer(player1, 5, 5, 4)
+	testBoard.placePlayer(player2, 5, 5, 3)
+
+	testBoard.addTileToBoard(tile, 5, 5)
+
+	for p in playerList:
+		board.movePlayer(p)
+
+
+moveFromEdge()
+multiTileMove()
