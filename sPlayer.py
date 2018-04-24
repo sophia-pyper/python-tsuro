@@ -2,21 +2,6 @@
 
 class sPlayer:
 
-	"""
-
-	"""
-
-	#[x,y,z] - x and y representing which space and z representing which tick (based on convention below)
-	"""
-	    0  1
-	  ________
-	7 |       | 2
-	  |       |
-	6 |_______| 3
-	    5  4
-
-	"""
-
 	def __init__(self, color, age):
 		#token color
 		self.color = color

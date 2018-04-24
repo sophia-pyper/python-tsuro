@@ -3,8 +3,6 @@ import copy
 class Board:
 	
 	def __init__(self, rows = 6, cols = 6):
-		self.rows = rows
-		self.cols = cols
 		spaces = []
 		#creates a matrix of empty spaces
 		for row in range(rows):

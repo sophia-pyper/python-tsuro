@@ -1,7 +1,5 @@
 #tile class
 
-#import legal tilelist
-from tilelist import tilelist
 
 class Tile:
 	
