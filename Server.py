@@ -39,8 +39,8 @@ class Server:
 			return "Player(s) "+playersIn+" have won!"
 
 
-	 #Returns true if player move is legal, false otherwise
-	 def is_play_legal(tile, player, board):
+	#Returns true if player move is legal, false otherwise
+	def is_play_legal(tile, player, board):
 
 	 	okMovesList = board.findLegalMoves(player)
 	 	if (tile.paths in okMovesList):
@@ -48,16 +48,16 @@ class Server:
 	 	else:
 	 		return False
 
-	 #Allows you to draw a tile. Returns tuple with chosen tile and updated list 
-	 def drawTile(tilePile):
+	#Allows you to draw a tile. Returns tuple with chosen tile and updated list 
+	def drawTile(tilePile):
 	 	index = random.randint(0, len(tilePile-1))
 	 	tile = tilePile[index]
 	 	tilePile.remove(tile)
 	 	return [tile, tilePile]
 
 
-	 def play_a_turn(self, tilePile, inList, outList, board, tile):
-	 	player = inList[0]
+	def play_a_turn(self, tilePile, inList, outList, board, tile):
+		player = inList[0]
 	 	#place tile on board
 	 	board.addTileToBoard(tile, player.location[0], player.location[1])
 	 	#move first player to end
@@ -117,8 +117,8 @@ class Server:
 		 		player.addTileToHand(getTile[0])
 		 		tilePile = getTile[1]
 
-		 #If there's no tiles to give and no one has the dragon tile, give it to the current player
-		 else:
+		#If there's no tiles to give and no one has the dragon tile, give it to the current player
+		else:
 		 	if not self.hasDragonTile:
 		 		self.hasDragonTile = player
 

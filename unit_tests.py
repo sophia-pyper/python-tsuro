@@ -47,12 +47,6 @@ player1.removeTile(testtile)
 if(len(player1.hand)!=0):
 	print "Remove tile from hand test failed!"
 
-#WE KNOW THAT THIS WORKS
-#test that killing player works
-player1.kill(True)
-if(not player1.dead):
-	print "Player kill test failed!"
-
 
 
 #Board TESTS
@@ -84,8 +78,8 @@ if(testboard.spaces[0][0] != expected):
 
 #test for impossible situation if player1 is only given testtile (which always leads to edge)
 player1.addTileToHand(testtile)
-badmoves = testboard.findIllegalMoves(player1)
-if(len(badmoves) != 0): #there are no bad moves since the testtile always leads to suicide
+legalmoves = testboard.findLegalMoves(player1)
+if(len(legalmoves) == 0): #there are no bad moves since the testtile always leads to suicide
 	print "Impossible bad moves test failed!"
 
 #test for checkadjacenttick by forcing player2 position
@@ -179,7 +173,7 @@ def multiElimMove():
 
 	if(not player1.dead):
 		print "multiElimMove test failed, player1 not dead as expected"
-	if(not player2.dead);
+	if(not player2.dead):
 		print "multiElimMove test failed, player2 not dead as expected"
 
 #Tests adding a rotated tile to the board
@@ -188,15 +182,31 @@ def addRotatedTile():
 	testBoard = Board()
 
 	tile.rotate() #output should be [[0,2],[3,5],[4,7],[1,6]]
-	testBoard.addTiletoBoard(tile,0,0)
+	testBoard.addTileToBoard(tile,0,0)
 
 	expected = [[1,2],[1,6],[0,0],[0,5],[0,7],[0,3],[1,1],[1,4]]
-	if(testBoard.spaces[0][0] != expected)
+	if(testBoard.spaces[0][0] != expected):
 		print "addRotatedTile test failed."
 		print "expected [[1,2],[1,6],[0,0],[0,5],[0,7],[0,3],[1,1],[1,4]], got " + testBoard.spaces[0][0]
+
+#Tests that an illegal move is not approved when there is a legal move available
+def blockIllegal():
+	legal = Tile([[0,2],[1,3],[4,6],[5,7]])
+	illegal = Tile([[0,1],[2,3],[4,5],[6,7]])
+	testBoard = Board()
+	player = sPlayer("blue", 30)
+
+	testBoard.placePlayer(player,0,0,0)
+	player.addTileToHand(legal)
+	player.addTileToHand(illegal)
+	legalmoves = testBoard.findLegalMoves(player)
+
+	if(illegal in legalmoves):
+		print "blockIllegal test failed, illegal move is marked as legal"
 
 moveFromEdge()
 multiTileMove()
 multiPlayerMove()
 multiElimMove()
 addRotatedTile()
+blockIllegal()

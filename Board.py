@@ -64,10 +64,10 @@ class Board:
 	 			#if at some point the player died, add move to illegal list
 	 			if (player.dead):
 	 				player.dead = False
-	 				illegalMoves.append()
+	 				illegalMoves.append(tile.paths)
 	 			#otherwise, move is legal and can be added to list
 	 			else:
-	 				legalMoves.append()
+	 				legalMoves.append(tile.paths)
 	 			#reverts board
 	 			boardCopy = copy.deepcopy(self)
 	 			player.updateLocation(currRow, currCol, currTick)
