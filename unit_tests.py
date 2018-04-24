@@ -55,7 +55,6 @@ if(not player1.dead):
 
 
 
-
 #Board TESTS
 
 #test for adding player1 to board
@@ -114,9 +113,9 @@ def moveFromEdge():
 	testBoard.addTileToBoard(tile,0,0)
 	testBoard.movePlayer(player1)
 	if (player1.location == [0,1,7]):
-		print "moveFromEdge passed"
+		print "moveFromEdge test passed"
 	else:
-		print "moveFromEdge failed with player location at ", player1.location, " rather than [0,1,7]."
+		print "moveFromEdge test failed with player location at ", player1.location, " rather than [0,1,7]."
 	return
 
 #Tests whether player successfully traverses multiple tiles
@@ -129,7 +128,7 @@ def multiTileMove():
 	tile2 = Tile([[0,3],[1,6],[2,5],[4,7]])
 	#player would continue to 1 and move to 5
 	tile3 = Tile([[0,6],[1,5],[2,4],[3,7]])
-	#player would continue to 0 then stop
+	#player would continue to tick 5 (tick 0 on next tile) then stop
 
 	testBoard.placePlayer(player1, 0, 0, 0)
 	testBoard.addTileToBoard(tile1,0,0)
@@ -137,12 +136,12 @@ def multiTileMove():
 	testBoard.addTileToBoard(tile3,1,1)
 	testBoard.movePlayer(player1)
 
-
 	if (player1.location == [2,1,0]):
-		print "multiTileMove passed"
+		print "multiTileMove test passed"
 	else:
-		print "multiTileMove failed with player location at ", player1.location, " rather than [2,1,0]."
+		print "multiTileMove test failed with player location at ", player1.location, " rather than [2,1,0]."
 
+#Tests whether two players moving on same turn works
 def multiPlayerMove():
 	player1 = sPlayer("blue", 20)
 	player2 = sPlayer("red", 30)
@@ -157,8 +156,47 @@ def multiPlayerMove():
 	testBoard.addTileToBoard(tile, 5, 5)
 
 	for p in playerList:
-		board.movePlayer(p)
+		testBoard.movePlayer(p)
 
+	if(player1.location != [4,5,5]):
+		print "multiPlayerMove test failed, player1 location expected [4,5,5], got " + player1.location
+	if(player2.location != [5,4,2]):
+		print "multiPlayerMove test failed, player2 location expected [5,4,2], got " + player2.location
+
+#Tests when multiple players are eliminated at once
+def multiElimMove():
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	testBoard = Board()
+	tile = Tile([[0,1],[2,3],[4,5],[6,7]])
+
+	testBoard.placePlayer(player1,0,0,0)
+	testBoard.placePlayer(player2,0,0,7)
+	testBoard.addTileToBoard(tile,0,0)
+
+	testBoard.movePlayer(player1)
+	testBoard.movePlayer(player2)
+
+	if(not player1.dead):
+		print "multiElimMove test failed, player1 not dead as expected"
+	if(not player2.dead);
+		print "multiElimMove test failed, player2 not dead as expected"
+
+#Tests adding a rotated tile to the board
+def addRotatedTile():
+	tile = Tile([[0,6],[1,3],[2,5],[4,7]])
+	testBoard = Board()
+
+	tile.rotate() #output should be [[0,2],[3,5],[4,7],[1,6]]
+	testBoard.addTiletoBoard(tile,0,0)
+
+	expected = [[1,2],[1,6],[0,0],[0,5],[0,7],[0,3],[1,1],[1,4]]
+	if(testBoard.spaces[0][0] != expected)
+		print "addRotatedTile test failed."
+		print "expected [[1,2],[1,6],[0,0],[0,5],[0,7],[0,3],[1,1],[1,4]], got " + testBoard.spaces[0][0]
 
 moveFromEdge()
 multiTileMove()
+multiPlayerMove()
+multiElimMove()
+addRotatedTile()
