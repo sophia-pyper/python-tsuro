@@ -6,98 +6,94 @@ from tilelist import tilelist
 import copy
 
 
-
 #game class instances to be used in testing below
-player1 = sPlayer("blue", 20)
-player2 = sPlayer("red", 30)
+splayer1 = sPlayer("blue", 20)
+splayer2 = sPlayer("red", 30)
 testtile = Tile([[0,1],[2,3],[4,5],[6,7]])  
-testboard = Board()
-
+test = Board()
 
 
 #TILE TESTS
+def TileTests():
+	#test that constructor works
+	if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
+		print "Tile constructor test failed!"
 
-#test that constructor works
-if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
-	print "Tile constructor test failed!"
+	#test that rotating once works
+	testtile.rotate()
+	#Rotating once should change paths to [[2,3],[4,5],[6,7],[0,1]], test
+	if(testtile.paths != [[2,3],[4,5],[6,7],[0,1]]):
+		print "Expected [[2,3],[4,5],[6,7],[0,1]] but received " + str(testtile.paths)
+		print "Tile rotation test failed!"
 
-#test that rotating once works
-testtile.rotate()
-#Rotating once should change paths to [[2,3],[4,5],[6,7],[0,1]], test
-if(testtile.paths != [[2,3],[4,5],[6,7],[0,1]]):
-	print "Expected [[2,3],[4,5],[6,7],[0,1]] but received " + str(testtile.paths)
-	print "Tile rotation test failed!"
-
-#test that multi-rotation works (3 more rotations should result in original tile)
-testtile.rotate()
-testtile.rotate()
-testtile.rotate()
-if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
-	print "Expected [[0,1],[2,3],[4,5],[6,7]] but received " + str(testtile.paths)
-	print "Tile multi-rotation test failed!"
-
+	#test that multi-rotation works (3 more rotations should result in original tile)
+	testtile.rotate()
+	testtile.rotate()
+	testtile.rotate()
+	if(testtile.paths != [[0,1],[2,3],[4,5],[6,7]]):
+		print "Expected [[0,1],[2,3],[4,5],[6,7]] but received " + str(testtile.paths)
+		print "Tile multi-rotation test failed!"
 
 
 #sPlayer TESTS
+def sPlayerTests():
+	#test for adding tile to hand
+	splayer1.addTileToHand(testtile)
+	if(len(splayer1.hand)==0):
+		print "Add tile to hand test failed!"
 
-#test for adding tile to hand
-player1.addTileToHand(testtile)
-if(len(player1.hand)==0):
-	print "Add tile to hand test failed!"
-
-#test for removing tile from hand
-player1.removeTile(testtile)
-if(len(player1.hand)!=0):
-	print "Remove tile from hand test failed!"
-
+	#test for removing tile from hand
+	splayer1.removeTile(testtile)
+	if(len(splayer1.hand)!=0):
+		print "Remove tile from hand test failed!"
 
 
 #Board TESTS
+def BoardTests():
+	#test for adding splayer1 to board
+	t1 = test.placePlayer(splayer1,0,0,0) #place splayer1 on the upper left most tick
+	if(not t1):
+		print "splayer1 not placed!"
+		print "Only player placing test failed!"
+	if(test.spaces[0][0][0][1] != "P"): #check that "X" has been changed to "P"
+		print "splayer1 occupation indicator not present!"
+		print "Only player placing test failed!"
 
-#test for adding player1 to board
-t1 = testboard.placePlayer(player1,0,0,0) #place player1 on the upper left most tick
-if(not t1):
-	print "Player1 not placed!"
-	print "Only player placing test failed!"
-if(testboard.spaces[0][0][0][1] != "P"): #check that "X" has been changed to "P"
-	print "Player1 occupation indicator not present!"
-	print "Only player placing test failed!"
+	#test checkcurrtick on splayer1
+	t2 = test.checkCurrTick(splayer1)
+	if(not t2):
+		print "checkCurrTick test failed!"
 
-#test checkcurrtick on player1
-t2 = testboard.checkCurrTick(player1)
-if(not t2):
-	print "checkCurrTick test failed!"
+	#test for attempting to add player 2 to player 1's position
+	t3 = test.placePlayer(splayer2,0,0,0)
+	if(t3):
+		print "Player placement overlap test failed!"
 
-#test for attempting to add player 2 to player 1's position
-t3 = testboard.placePlayer(player2,0,0,0)
-if(t3):
-	print "Player placement overlap test failed!"
+	#test for adding tile to board
+	test.addTileToBoard(testtile,0,0)
+	expected = [[1,1],[1,0],[0,3],[0,2],[0,5],[0,4],[1,7],[1,6]]
+	if(test.spaces[0][0] != expected):
+		print "Adding tile to board test failed!"
 
-#test for adding tile to board
-testboard.addTileToBoard(testtile,0,0)
-expected = [[1,1],[1,0],[0,3],[0,2],[0,5],[0,4],[1,7],[1,6]]
-if(testboard.spaces[0][0] != expected):
-	print "Adding tile to board test failed!"
+	#test for impossible situation if splayer1 is only given testtile (which always leads to edge)
+	splayer1.addTileToHand(testtile)
+	legalmoves = test.findLegalMoves(splayer1)
+	if(len(legalmoves) == 0): #there are no bad moves since the testtile always leads to suicide
+		print "Impossible bad moves test failed!"
 
-#test for impossible situation if player1 is only given testtile (which always leads to edge)
-player1.addTileToHand(testtile)
-legalmoves = testboard.findLegalMoves(player1)
-if(len(legalmoves) == 0): #there are no bad moves since the testtile always leads to suicide
-	print "Impossible bad moves test failed!"
+	#test for checkadjacenttick by forcing splayer2 position
+	splayer2.updateLocation(0,0,3)
+	t4 = test.checkAdjacentTick(splayer2)
+	if(t4 != [0,1,6]):
+		print "checkAdjacentTick test failed!"
 
-#test for checkadjacenttick by forcing player2 position
-player2.updateLocation(0,0,3)
-t4 = testboard.checkAdjacentTick(player2)
-if(t4 != [0,1,6]):
-	print "checkAdjacentTick test failed!"
-
-#test moveplayer on player1 (who should be eliminated) and player2 (who ends up on 0,0,2)
-testboard.movePlayer(player1)
-testboard.movePlayer(player2)
-if(player2.location != [0,1,7]):
-	print "movePlayer on Player2 test failed!"
-if(not player1.dead):
-	print "movePlayer on Player1 test failed!"
+	#test moveplayer on splayer1 (who should be eliminated) and splayer2 (who ends up on 0,0,2)
+	test.movePlayer(splayer1)
+	test.movePlayer(splayer2)
+	if(splayer2.location != [0,1,7]):
+		print "movePlayer on Player2 test failed!"
+	if(not splayer1.dead):
+		print "movePlayer on Player1 test failed!"
 
 ###MOVEMENT TESTS###
 
@@ -380,6 +376,10 @@ def dragonOwnerSelfElim():
 #Test for whether dealing function results in all players having hands of 3 cards
 
 def runAllTests():
+	print "Running Basic Tests:"
+	TileTests()
+	sPlayerTests()
+	BoardTests()
 	print "Running Movement Tests:"
 	moveFromEdge()
 	multiTileMove()
