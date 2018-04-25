@@ -84,6 +84,12 @@ class Server:
 	 	for j in out:
 	 		if (j == self.hasDragonTile):
 	 			self.hasDragonTile = False
+	 			#give dragon tile to next person on line if they need it
+	 			ind = inList.index(j)
+	 			if (ind == (len(inList)-1)):
+	 				ind = 0
+	 			if (len(inList[ind+1].hand) < 3):
+	 				hasDragonTile = inList[ind+1]
 	 		#Returns dead player's cards 
 	 		for t in j.hand:
 	 			tilePile.append(t)

@@ -3,6 +3,7 @@ from Tile import Tile
 from Board import Board
 from Server import Server
 from tilelist import tilelist
+import copy
 
 
 
@@ -227,7 +228,7 @@ def noDragonTile():
 	playersIn = [player1, player2]
 	playersOut = []
 	tile = False
-	drawPile = tilelist
+	drawPile = copy.deepcopy(tilelist)
 	board.placePlayer(playersIn[0], 0, 0, 0)
  	board.placePlayer(playersIn[1], 0, 2, 0)
  	drawPile = serv.dealTiles(playersIn, drawPile)
@@ -251,7 +252,7 @@ def dragonTileOwner():
 	playersIn = [player1, player2]
 	playersOut = []
 	tile = False
-	drawPile = tilelist
+	drawPile = copy.deepcopy(tilelist)
 	board.placePlayer(playersIn[0], 0, 0, 0)
  	board.placePlayer(playersIn[1], 0, 2, 0)
  	drawPile = serv.dealTiles(playersIn, drawPile)
@@ -282,7 +283,7 @@ def dragonTileElim1():
 	playersIn = [player1, player2, player3]
 	playersOut = []
 	tile = Tile([[0,4],[1,7],[2,3],[5,6]])
-	drawPile = tilelist
+	drawPile = copy.deepcopy(tilelist)
 	board.placePlayer(playersIn[0], 0, 0, 0)
  	board.placePlayer(playersIn[1], 0, 0, 1)
  	board.placePlayer(playersIn[2], 0, 2, 0)
@@ -298,7 +299,7 @@ def dragonTileElim1():
  	else:
  		print "dragonTileElim1 passed"
 
-#Tests whether dragon tile ownership rotates after elimination when draw pile is refilled and then emptied
+#Tests whether dragon tile ownership rotates after an elimination when draw pile is refilled and then emptied
 def dragonTileElim2():
 	serv = Server()
 	board = Board()
@@ -308,7 +309,7 @@ def dragonTileElim2():
 	playersIn = [player1, player2, player3]
 	playersOut = []
 	tile = Tile([[0,4],[1,7],[2,3],[5,6]])
-	drawPile = tilelist
+	drawPile = copy.deepcopy(tilelist)
 	board.placePlayer(playersIn[0], 0, 0, 0)
  	board.placePlayer(playersIn[1], 0, 0, 1)
  	board.placePlayer(playersIn[2], 0, 2, 0)
@@ -323,6 +324,57 @@ def dragonTileElim2():
  		print "dragonTileElim2 failed: hasDragonTile value is ", serv.hasDragonTile, " instead of player3"
  	else:
  		print "dragonTileElim2 passed"
+
+#Tests whether dragon tile owner gets set to False if owner is eliminated and no one else needs it
+def dragonOwnerElim():
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	player3 = sPlayer("green", 30)
+	playersIn = [player3, player1, player2]
+	playersOut = []
+	tile = Tile([[0,4],[1,7],[2,3],[5,6]])
+	drawPile = copy.deepcopy(tilelist)
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 0, 1)
+ 	board.placePlayer(playersIn[2], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+ 	#Player 2 has dragon tile. Everyone else has full hand
+ 	player2.hand = player2.hand[1:]
+ 	drawPile = []
+ 	serv.hasDragonTile = player2
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if serv.hasDragonTile:
+ 		print "dragonOwnerElim failed: hasDragonTile value is ", serv.hasDragonTile, " instead of False"
+ 	else:
+ 		print "dragonOwnerElim passed"
+
+#Tests whether hasDragonTile is reset to false when dragon tile owner eliminates self
+def dragonOwnerSelfElim():
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	player3 = sPlayer("green", 30)
+	playersIn = [player1, player2, player3]
+	playersOut = []
+	tile = Tile([[0,1],[2,3],[4,5],[6,7]])
+	drawPile = copy.deepcopy(tilelist)
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 0, 1)
+ 	board.placePlayer(playersIn[2], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+ 	#Player 1 has dragon tile. Everyone else has full hand
+ 	player1.hand = player1.hand[1:]
+ 	drawPile = []
+ 	serv.hasDragonTile = player1
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if serv.hasDragonTile:
+ 		print "dragonOwnerSelfElim failed: hasDragonTile value is ", serv.hasDragonTile, " instead of False"
+ 	else:
+ 		print "dragonOwnerSelfElim passed"
+
 
 
 #Test for whether dealing function results in all players having hands of 3 cards
@@ -340,6 +392,8 @@ def runAllTests():
 	dragonTileOwner()
 	dragonTileElim1()
 	dragonTileElim2()
+	dragonOwnerElim()
+	dragonOwnerSelfElim()
 	print "Dragon Tile Tests Complete."
 
 runAllTests()
