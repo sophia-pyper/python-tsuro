@@ -1,3 +1,5 @@
+import random
+from Tile import Tile
 #server representation of class
 
 class sPlayer:
@@ -22,8 +24,14 @@ class sPlayer:
 	def addTileToHand(self,tile):
 		self.hand.append(tile)
 
-	def getTileChoice(self, tile):
-		return self.hand[0]
+	#for now, generates a random tile/roation
+	def getTileChoice(self):
+		index = random.randint(0, len(self.hand)-1)
+		tile = self.hand[index]
+		rotate = random.randint(0,3)
+		for i in range(rotate):
+			tile.rotate()
+		return tile
 
 	def removeTile(self, tile):
 		for t in range(len(self.hand)):

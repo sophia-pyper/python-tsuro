@@ -1,5 +1,7 @@
 from tilelist import tilelist
 from Board import Board
+from sPlayer import sPlayer
+from Tile import Tile
 import random
 
 class Server:
@@ -21,6 +23,9 @@ class Server:
 	 	board.placePlayer(playersIn[0], 0, 0, 0)
 	 	board.placePlayer(playersIn[1], 0, 2, 0)
 
+	 	#Start everyone off with three tiles
+	 	drawPile = dealTiles(playersIn, drawPile)
+
 		while True: #while tile choice is invalid, keep getting different choice
 			player = playersIn[0]
 			newTile = player.getTileChoice() 
@@ -40,7 +45,7 @@ class Server:
 
 
 	#Returns true if player move is legal, false otherwise
-	def is_play_legal(tile, player, board):
+	def is_play_legal(self, tile, player, board):
 
 	 	okMovesList = board.findLegalMoves(player)
 	 	if (tile.paths in okMovesList):
@@ -49,11 +54,21 @@ class Server:
 	 		return False
 
 	#Allows you to draw a tile. Returns tuple with chosen tile and updated list 
-	def drawTile(tilePile):
-	 	index = random.randint(0, len(tilePile-1))
+	def drawTile(self, tilePile):
+	 	index = random.randint(0, len(tilePile)-1)
 	 	tile = tilePile[index]
 	 	tilePile.remove(tile)
+	 	tile = Tile(tile)
 	 	return [tile, tilePile]
+
+	#Deals initial hand and returns updated tile pile
+	def dealTiles(self, inList, tilePile):
+		for p in inList:
+	 		for i in range(3):
+	 			getTile = self.drawTile(tilePile)
+	 			p.addTileToHand(getTile[0])
+	 			tilePile = getTile[1]
+	 	return tilePile
 
 
 	def play_a_turn(self, tilePile, inList, outList, board, tile):
@@ -61,7 +76,8 @@ class Server:
 	 	#place tile on board
 	 	board.addTileToBoard(tile, player.location[0], player.location[1])
 	 	#move first player to end
-	 	inList = inList[1:]+inList[0]
+	 	inList = inList[1:]
+	 	inList.append(player)
 	 	#move player and mark the dead ones
 	 	out = board.moveAllPlayers(inList)
 	 	#removes dead players from in list
@@ -91,7 +107,7 @@ class Server:
 	 			#Create a list ordered by who will get dealt to
 	 			dealList = []
 	 			for p in range(len(inList)):
-	 				if (inList[p] == hasDragonTile):
+	 				if (inList[p] == self.hasDragonTile):
 	 					dealList = inList[p:] + inList[:p]
 	 					self.hasDragonTile = False
 	 					break
@@ -101,7 +117,7 @@ class Server:
 	 				if (len(d.hand) < 3):
 	 					#If there's cards left in the pile, give them one
 	 					if (len(tilePile) > 0):
-	 						newTile = drawTile(tilePile)
+	 						newTile = self.drawTile(tilePile)
 	 						d.addTileToHand(newTile[0])
 	 						tilePile = newTile[1]
 	 					#Otherwise, they get the dragon tile
@@ -113,7 +129,7 @@ class Server:
 	 					break
 	 		#If no one has the dragon tile and the player who just went is still in, they get to draw
 		 	elif ((player == inList[-1]) and (len(player.hand) < 3)):
-		 		getTile = drawTile(tilePile)
+		 		getTile = self.drawTile(tilePile)
 		 		player.addTileToHand(getTile[0])
 		 		tilePile = getTile[1]
 

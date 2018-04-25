@@ -2,6 +2,8 @@ from sPlayer import sPlayer
 from Tile import Tile
 from Board import Board
 from Server import Server
+from tilelist import tilelist
+
 
 
 #game class instances to be used in testing below
@@ -152,9 +154,11 @@ def multiPlayerMove():
 	for p in playerList:
 		testBoard.movePlayer(p)
 
-	if(player1.location != [4,5,5]):
+	if ((player1.location == [4,5,5]) and (player2.location == [5,4,2])):
+		print "multiPlayerMove passed"
+	elif(player1.location != [4,5,5]):
 		print "multiPlayerMove test failed, player1 location expected [4,5,5], got " + player1.location
-	if(player2.location != [5,4,2]):
+	elif(player2.location != [5,4,2]):
 		print "multiPlayerMove test failed, player2 location expected [5,4,2], got " + player2.location
 
 #Tests when multiple players are eliminated at once
@@ -171,9 +175,11 @@ def multiElimMove():
 	testBoard.movePlayer(player1)
 	testBoard.movePlayer(player2)
 
-	if(not player1.dead):
+	if (player1.dead and player2.dead):
+		print "multiElimMove passed"
+	elif(not player1.dead):
 		print "multiElimMove test failed, player1 not dead as expected"
-	if(not player2.dead):
+	elif(not player2.dead):
 		print "multiElimMove test failed, player2 not dead as expected"
 
 #Tests adding a rotated tile to the board
@@ -188,6 +194,8 @@ def addRotatedTile():
 	if(testBoard.spaces[0][0] != expected):
 		print "addRotatedTile test failed."
 		print "expected [[1,2],[1,6],[0,0],[0,5],[0,7],[0,3],[1,1],[1,4]], got " + testBoard.spaces[0][0]
+	else:
+		print "addRotatedTile passed"
 
 #Tests that an illegal move is not approved when there is a legal move available
 def blockIllegal():
@@ -201,12 +209,137 @@ def blockIllegal():
 	player.addTileToHand(illegal)
 	legalmoves = testBoard.findLegalMoves(player)
 
-	if(illegal in legalmoves):
+	if(illegal.paths in legalmoves):
 		print "blockIllegal test failed, illegal move is marked as legal"
+	elif(legal.paths not in legalmoves):
+		print "blockIllegal test failed, legal move did not appear in list" , legalmoves
+	else:
+		print "blockIllegal passed"
 
-moveFromEdge()
-multiTileMove()
-multiPlayerMove()
-multiElimMove()
-addRotatedTile()
-blockIllegal()
+##HAND/DRAGON TILE TESTS
+#Ensures no dragon tile is issued when it is unnecessary
+def noDragonTile():
+	#Create server instance and set up turn
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	playersIn = [player1, player2]
+	playersOut = []
+	tile = False
+	drawPile = tilelist
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+	while not tile:
+		newT = player1.getTileChoice()
+		if (serv.is_play_legal(newT, player1, board)):
+			tile = newT
+			player1.removeTile(tile)
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if serv.hasDragonTile:
+ 		print "noDragonTile test failed: player ", serv.hasDragonTile, " has a dragon tile."
+ 	else:
+ 		print "noDragonTile passed"
+
+#Tests whether dragon tile switches to another player
+def dragonTileOwner():
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	playersIn = [player1, player2]
+	playersOut = []
+	tile = False
+	drawPile = tilelist
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+ 	#Ensure both players have only two tiles, which would qualify both for dragon tile
+ 	while not tile:
+		newT = player1.getTileChoice()
+		if (serv.is_play_legal(newT, player1, board)):
+			tile = newT
+			player1.removeTile(tile)
+ 	player2.hand = player2.hand[1:]
+ 	#Let player 2 have received it on the previous turn
+ 	serv.hasDragonTile = player2
+ 	#Make draw pile empty
+ 	drawPile = []
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if not (serv.hasDragonTile == player2):
+ 		print "dragonTileOwner failed: hasDragonTile value is ", serv.hasDragonTile, " instead of player2"
+ 	else:
+ 		print "dragonTileOwner passed"
+
+#Tests whether dragon tile owner changes when they eliminate another player (should change since the dead player's tiles return to the hand)
+def dragonTileElim1():
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	player3 = sPlayer("green", 30)
+	playersIn = [player1, player2, player3]
+	playersOut = []
+	tile = Tile([[0,4],[1,7],[2,3],[5,6]])
+	drawPile = tilelist
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 0, 1)
+ 	board.placePlayer(playersIn[2], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+ 	#Give everyone 2 tiles instead of 3
+ 	for p in playersIn:
+ 		p.hand = p.hand[1:]
+ 	drawPile = []
+ 	serv.hasDragonTile = player1
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if serv.hasDragonTile:
+ 		print "dragonTileElim1 failed: hasDragonTile value is ", serv.hasDragonTile, " instead of False"
+ 	else:
+ 		print "dragonTileElim1 passed"
+
+#Tests whether dragon tile ownership rotates after elimination when draw pile is refilled and then emptied
+def dragonTileElim2():
+	serv = Server()
+	board = Board()
+	player1 = sPlayer("blue", 20)
+	player2 = sPlayer("red", 30)
+	player3 = sPlayer("green", 30)
+	playersIn = [player1, player2, player3]
+	playersOut = []
+	tile = Tile([[0,4],[1,7],[2,3],[5,6]])
+	drawPile = tilelist
+	board.placePlayer(playersIn[0], 0, 0, 0)
+ 	board.placePlayer(playersIn[1], 0, 0, 1)
+ 	board.placePlayer(playersIn[2], 0, 2, 0)
+ 	drawPile = serv.dealTiles(playersIn, drawPile)
+ 	#Give everyone 1 tiles instead of 3
+ 	for p in playersIn:
+ 		p.hand = p.hand[2:]
+ 	drawPile = []
+ 	serv.hasDragonTile = player1
+ 	serv.play_a_turn(drawPile, playersIn, playersOut, board, tile)
+ 	if not (serv.hasDragonTile == player3):
+ 		print "dragonTileElim2 failed: hasDragonTile value is ", serv.hasDragonTile, " instead of player3"
+ 	else:
+ 		print "dragonTileElim2 passed"
+
+
+#Test for whether dealing function results in all players having hands of 3 cards
+
+def runAllTests():
+	print "Running Movement Tests:"
+	moveFromEdge()
+	multiTileMove()
+	multiPlayerMove()
+	multiElimMove()
+	addRotatedTile()
+	blockIllegal()
+	print "Movement Tests Complete. Running Dragon Tile Tests:"
+	noDragonTile()
+	dragonTileOwner()
+	dragonTileElim1()
+	dragonTileElim2()
+	print "Dragon Tile Tests Complete."
+
+runAllTests()

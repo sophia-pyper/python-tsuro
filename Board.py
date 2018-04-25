@@ -1,4 +1,5 @@
 import copy
+from Tile import Tile
 
 class Board:
 	
@@ -119,13 +120,13 @@ class Board:
 
 	 	#looks at what tick the current path leads to
 	 	connector = self.spaces[currRow][currCol][currTick][1]
-	 	if (connector != "X"): #if a path exists
+	 	if ((connector != "X") and (connector != "P")): #if a path exists
 	 		if (connector >= 0 and connector <= 7):
 	 			#Move player to tick at end of path
 	 			player.updateLocation(currRow, currCol, connector)
 
 	 		else:
-	 			print "Something went wrong - invalid path"
+	 			print "Something went wrong - invalid path. Connector is ", connector
 
 		 	#check if player hit a wall. also checks for collisions inherently
 		 	if (self.checkCurrTick(player)):
